@@ -1225,115 +1225,117 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
           builder: (BuildContext context, StateSetter setState) {
             return Dialog(
               backgroundColor: Colors.transparent, // Transparenter Hintergrund
-              child: Container(
-                padding: EdgeInsets.all(16.0),
-                color: Colors.white, // Weißer Hintergrund für den Container
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(
-                        'SCHULDEN',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    // Zentriertes Dropdown-Widget für die Auswahl des Multiplikators
-                    Container(
-                      alignment: Alignment.center,
-                      child: DropdownButton<String>(
-                        value: selectedMultiplier,
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedMultiplier = newValue!;
-                            // Nach dem Ändern des Multiplikators die Beträge neu berechnen und aktualisieren
-                            _calculatePrizeMoney(sortedPlayers, prizeMoneyMap, selectedMultiplier);
-                          });
-                        },
-                        dropdownColor: Colors.white, // Weißer Hintergrund für das Dropdown-Menü
-                        items: <String>['0.05', '0.10', '0.15', '0.20'].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value + ' Cent'),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: prizeMoneyMap.entries.map((entry) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${entry.key} an',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: entry.value.entries.map((innerEntry) {
-                                String playerName = innerEntry.key;
-                                bool isChecked = isCheckedMap[entry.key]![playerName] ?? false; // Status der Checkbox
-
-                                return Row(
-                                  children: [
-                                    Text(
-                                      '$playerName ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Icon(Icons.arrow_forward), // Icon anstelle des Pfeils
-                                    Text(
-                                      ' ${innerEntry.value.abs().toInt()} €', // Eurobetrag
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold, // Fett für den Betrag
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Checkbox(
-                                      value: isChecked,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          isCheckedMap[entry.key]![playerName] = value ?? false; // Update des Status der Checkbox
-                                        });
-                                      },
-                                      activeColor: Colors.green, // Farbe für das grüne X
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
-                            ),
-                            SizedBox(height: 8),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.center,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+              child: SingleChildScrollView( // Scrollbare Ansicht hinzugefügt
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  color: Colors.white, // Weißer Hintergrund für den Container
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
                         child: Text(
-                          'OK',
+                          'SCHULDEN',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 24,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 8),
+                      // Zentriertes Dropdown-Widget für die Auswahl des Multiplikators
+                      Container(
+                        alignment: Alignment.center,
+                        child: DropdownButton<String>(
+                          value: selectedMultiplier,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedMultiplier = newValue!;
+                              // Nach dem Ändern des Multiplikators die Beträge neu berechnen und aktualisieren
+                              _calculatePrizeMoney(sortedPlayers, prizeMoneyMap, selectedMultiplier);
+                            });
+                          },
+                          dropdownColor: Colors.white, // Weißer Hintergrund für das Dropdown-Menü
+                          items: <String>['0.05', '0.10', '0.15', '0.20'].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value + ' Cent'),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: prizeMoneyMap.entries.map((entry) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${entry.key} an',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: entry.value.entries.map((innerEntry) {
+                                  String playerName = innerEntry.key;
+                                  bool isChecked = isCheckedMap[entry.key]![playerName] ?? false; // Status der Checkbox
+
+                                  return Row(
+                                    children: [
+                                      Text(
+                                        '$playerName ',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_forward), // Icon anstelle des Pfeils
+                                      Text(
+                                        ' ${innerEntry.value.abs().toInt()} €', // Eurobetrag
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold, // Fett für den Betrag
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Checkbox(
+                                        value: isChecked,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            isCheckedMap[entry.key]![playerName] = value ?? false; // Update des Status der Checkbox
+                                          });
+                                        },
+                                        activeColor: Colors.green, // Farbe für das grüne X
+                                      ),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(height: 8),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'OK',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -1342,6 +1344,7 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
       },
     );
   }
+
 
 
 // Funktion zur Berechnung des Preisgeldes mit dem ausgewählten Multiplikator

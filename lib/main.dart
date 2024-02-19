@@ -1208,6 +1208,15 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
     // Berechnung des Preisgeldes mit dem Multiplikator 0,05
     _calculatePrizeMoney(sortedPlayers, prizeMoneyMap, selectedMultiplier);
 
+    // Map für den Status der Checkboxen
+    Map<String, Map<String, bool>> isCheckedMap = {};
+    for (var entry in prizeMoneyMap.entries) {
+      isCheckedMap[entry.key] = {};
+      for (var innerEntry in entry.value.entries) {
+        isCheckedMap[entry.key]![innerEntry.key] = false; // Setze den Standardwert für alle Checkboxen auf false
+      }
+    }
+
     // Anzeige des Preisgeld-Dialogs
     showDialog(
       context: context,
@@ -1271,10 +1280,13 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: entry.value.entries.map((innerEntry) {
+                                String playerName = innerEntry.key;
+                                bool isChecked = isCheckedMap[entry.key]![playerName] ?? false; // Status der Checkbox
+
                                 return Row(
                                   children: [
                                     Text(
-                                      '${innerEntry.key} ',
+                                      '$playerName ',
                                       style: TextStyle(
                                         fontSize: 16,
                                       ),
@@ -1286,6 +1298,15 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
                                         fontWeight: FontWeight.bold, // Fett für den Betrag
                                         fontSize: 16,
                                       ),
+                                    ),
+                                    Checkbox(
+                                      value: isChecked,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          isCheckedMap[entry.key]![playerName] = value ?? false; // Update des Status der Checkbox
+                                        });
+                                      },
+                                      activeColor: Colors.green, // Farbe für das grüne X
                                     ),
                                   ],
                                 );
@@ -1321,7 +1342,6 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
       },
     );
   }
-
 
 
 // Funktion zur Berechnung des Preisgeldes mit dem ausgewählten Multiplikator
@@ -1406,60 +1426,46 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
   }
 
   void _handleLeftXButtonPress(Player player) {
-    // Behandele den Klick auf das linke X für den angegebenen Spieler
-    // Füge +5 Punkte zum Spieler unter Berücksichtigung des ausgewählten Multiplikators hinzu
-    if (player != null && selectedMultiplier != null) {
+    if (!player.isVisible) return; // If player is hidden, do nothing
+    // Handle the click on the left X for the specified player
+    setState(() {
+      player.points += 5 * selectedMultiplier!.multiplier;
+      calculatedPoints = player.points;
+      player.isVisible = false; // Hide player after adding points
+    });
+
+    // Check if all players are hidden
+    if (widget.players.every((player) => !player.isVisible)) {
+      // If all players are hidden, automatically show them again and reset multiplier to x1
       setState(() {
-        player.points += 5 * selectedMultiplier!.multiplier;
-        calculatedPoints = player.points;
-        player.isVisible = false; // Spieler ausblenden
+        for (var player in widget.players) {
+          player.isVisible = true;
+        }
+        selectedMultiplier = pointsMultipliers[0];
+        selectedPointsOption = null;
       });
-
-      // Überprüfe, ob alle Spieler ausgeblendet sind
-      if (widget.players.every((player) => !player.isVisible)) {
-        // Wenn alle Spieler ausgeblendet sind, blende sie automatisch wieder ein und setze den Multiplikator auf x1 zurück
-        setState(() {
-          for (var player in widget.players) {
-            player.isVisible = true;
-          }
-
-          // Multiplikator auf x1 zurücksetzen
-          selectedMultiplier = pointsMultipliers[0];
-          selectedValue = 'x${selectedMultiplier!.multiplier}';
-
-          // Automatisch den nächsten Spieler im Uhrzeigersinn auswählen
-          _automaticallySelectNextPlayer();
-        });
-      }
     }
   }
 
   void _handleRightXButtonPress(Player player) {
-    // Behandle den Klick auf das rechte X für den angegebenen Spieler
-    // Füge +10 Punkte zum Spieler unter Berücksichtigung des ausgewählten Multiplikators hinzu
-    if (player != null && selectedMultiplier != null) {
+    if (!player.isVisible) return; // If player is hidden, do nothing
+    // Handle the click on the right X for the specified player
+    setState(() {
+      player.points += 10 * selectedMultiplier!.multiplier;
+      calculatedPoints = player.points;
+      player.isVisible = false; // Hide player after adding points
+    });
+
+    // Check if all players are hidden
+    if (widget.players.every((player) => !player.isVisible)) {
+      // If all players are hidden, automatically show them again and reset multiplier to x1
       setState(() {
-        player.points += 10 * selectedMultiplier!.multiplier;
-        calculatedPoints = player.points;
-        player.isVisible = false; // Spieler ausblenden
+        for (var player in widget.players) {
+          player.isVisible = true;
+        }
+        selectedMultiplier = pointsMultipliers[0];
+        selectedPointsOption = null;
       });
-
-      // Überprüfe, ob alle Spieler ausgeblendet sind
-      if (widget.players.every((player) => !player.isVisible)) {
-        // Wenn alle Spieler ausgeblendet sind, blende sie automatisch wieder ein und setze den Multiplikator auf x1 zurück
-        setState(() {
-          for (var player in widget.players) {
-            player.isVisible = true;
-          }
-
-          // Multiplikator auf x1 zurücksetzen
-          selectedMultiplier = pointsMultipliers[0];
-          selectedValue = 'x${selectedMultiplier!.multiplier}';
-
-          // Automatisch den nächsten Spieler im Uhrzeigersinn auswählen
-          _automaticallySelectNextPlayer();
-        });
-      }
     }
   }
 
@@ -1494,7 +1500,7 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
 
   void _applyPointsToPlayer(Player player, int points) {
     // Füge Punkte zum Spieler hinzu unter Berücksichtigung des Multiplikators
-    if (player != null && selectedMultiplier != null) {
+    if (player != null && selectedMultiplier != null && player.isVisible) {
       setState(() {
         player.points += points * selectedMultiplier!.multiplier;
         calculatedPoints = player.points;
@@ -1518,7 +1524,6 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
           }
           // Multiplikator auf x1 zurücksetzen
           selectedMultiplier = pointsMultipliers[0];
-          selectedValue = 'x${selectedMultiplier!.multiplier}';
         });
 
         // Automatisch den nächsten Spieler im Uhrzeigersinn auswählen
@@ -1526,6 +1531,7 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
       }
     }
   }
+
 
   void updateTotalPoints(Player player) {
     // Aktualisiere die Gesamtpunktzahl des Spielers

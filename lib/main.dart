@@ -1438,46 +1438,60 @@ class _PlayersTablePageState extends State<PlayersTablePage> {
   }
 
   void _handleLeftXButtonPress(Player player) {
-    if (!player.isVisible) return; // If player is hidden, do nothing
-    // Handle the click on the left X for the specified player
-    setState(() {
-      player.points += 5 * selectedMultiplier!.multiplier;
-      calculatedPoints = player.points;
-      player.isVisible = false; // Hide player after adding points
-    });
-
-    // Check if all players are hidden
-    if (widget.players.every((player) => !player.isVisible)) {
-      // If all players are hidden, automatically show them again and reset multiplier to x1
+    // Behandele den Klick auf das linke X für den angegebenen Spieler
+    // Füge +5 Punkte zum Spieler unter Berücksichtigung des ausgewählten Multiplikators hinzu
+    if (player != null && selectedMultiplier != null) {
       setState(() {
-        for (var player in widget.players) {
-          player.isVisible = true;
-        }
-        selectedMultiplier = pointsMultipliers[0];
-        selectedPointsOption = null;
+        player.points += 5 * selectedMultiplier!.multiplier;
+        calculatedPoints = player.points;
+        player.isVisible = false; // Spieler ausblenden
       });
+
+      // Überprüfe, ob alle Spieler ausgeblendet sind
+      if (widget.players.every((player) => !player.isVisible)) {
+        // Wenn alle Spieler ausgeblendet sind, blende sie automatisch wieder ein und setze den Multiplikator auf x1 zurück
+        setState(() {
+          for (var player in widget.players) {
+            player.isVisible = true;
+          }
+
+          // Multiplikator auf x1 zurücksetzen
+          selectedMultiplier = pointsMultipliers[0];
+          selectedValue = 'x${selectedMultiplier!.multiplier}';
+
+          // Automatisch den nächsten Spieler im Uhrzeigersinn auswählen
+          _automaticallySelectNextPlayer();
+        });
+      }
     }
   }
 
   void _handleRightXButtonPress(Player player) {
-    if (!player.isVisible) return; // If player is hidden, do nothing
-    // Handle the click on the right X for the specified player
-    setState(() {
-      player.points += 10 * selectedMultiplier!.multiplier;
-      calculatedPoints = player.points;
-      player.isVisible = false; // Hide player after adding points
-    });
-
-    // Check if all players are hidden
-    if (widget.players.every((player) => !player.isVisible)) {
-      // If all players are hidden, automatically show them again and reset multiplier to x1
+    // Behandle den Klick auf das rechte X für den angegebenen Spieler
+    // Füge +10 Punkte zum Spieler unter Berücksichtigung des ausgewählten Multiplikators hinzu
+    if (player != null && selectedMultiplier != null) {
       setState(() {
-        for (var player in widget.players) {
-          player.isVisible = true;
-        }
-        selectedMultiplier = pointsMultipliers[0];
-        selectedPointsOption = null;
+        player.points += 10 * selectedMultiplier!.multiplier;
+        calculatedPoints = player.points;
+        player.isVisible = false; // Spieler ausblenden
       });
+
+      // Überprüfe, ob alle Spieler ausgeblendet sind
+      if (widget.players.every((player) => !player.isVisible)) {
+        // Wenn alle Spieler ausgeblendet sind, blende sie automatisch wieder ein und setze den Multiplikator auf x1 zurück
+        setState(() {
+          for (var player in widget.players) {
+            player.isVisible = true;
+          }
+
+          // Multiplikator auf x1 zurücksetzen
+          selectedMultiplier = pointsMultipliers[0];
+          selectedValue = 'x${selectedMultiplier!.multiplier}';
+
+          // Automatisch den nächsten Spieler im Uhrzeigersinn auswählen
+          _automaticallySelectNextPlayer();
+        });
+      }
     }
   }
 
